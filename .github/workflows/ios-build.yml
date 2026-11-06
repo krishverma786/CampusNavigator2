@@ -1,0 +1,39 @@
+
+name: CampusNavigator2 iOS Build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-26
+
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v4
+
+      - name: Check Xcode
+        run: xcodebuild -version
+
+      - name: Build iOS app
+        run: |
+          xcodebuild \
+            -project CampusNavigator2.xcodeproj \
+            -scheme CampusNavigator2 \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            -configuration Debug \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+
+      - name: Package app
+        run: |
+          cd build/Build/Products
+          zip -r CampusNavigator2.zip Debug-iphonesimulator/CampusNavigator2.app
+
+      - name: Upload build
+        uses: actions/upload-artifact@v4
+        with:
+          name: CampusNavigator2-iOS
+          path: build/Build/Products/CampusNavigator2.zip
